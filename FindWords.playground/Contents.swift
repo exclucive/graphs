@@ -6,24 +6,8 @@ func == <T:Equatable> (tuple1:(T,T),tuple2:(T,T)) -> Bool {
     return (tuple1.0 == tuple2.0) && (tuple1.1 == tuple2.1)
 }
 
-let lettersMatrix = [["G", "O", "S"], ["A", "A", "E"], ["X", "P", "S"]]
-
-//func traverseMatrix(matrix: [[String]]) {
-//    var allWords:[String] = []
-//
-//    for i in 0..<lettersMatrix.count {
-//        for j in 0..<lettersMatrix[i].count {
-//
-//        }
-//    }
-//}
-//
-//
-///// i - row
-///// j - column
-//
-//func findChildrenOf(i: Int, j: Int) {
-//}
+//let lettersMatrix = [["G", "O", "S"], ["A", "A", "E"], ["X", "P", "S"]]
+let lettersMatrix = [["a", "b"], ["c", "d"]]
 
 func isIndexesCorrect(_ i: Int, _ j: Int) -> Bool {
     if i >= 0 && i < lettersMatrix.count && j >= 0 && j < lettersMatrix[i].count {
@@ -59,44 +43,63 @@ func neighborgsOf(i: Int, j: Int) -> [(i: Int, j: Int)] {
     return neighborgs
 }
 
-
-func dfs(i: Int, j: Int, visited: inout [(i: Int, j: Int)]) -> String {
-    var str = lettersMatrix[i][j]
-    visited.append((i, j))
+func dfs(i: Int, j: Int,
+         visited: inout [[Bool]],
+         words: inout [String: String],
+         str: inout String) {
+    str = str + lettersMatrix[i][j]
+    visited[i][j] = true
     
     let neigbors = neighborgsOf(i: i, j: j)
     for element in neigbors {
-        if visited.contains(where: {$0 == element}) ==  false {
-            str += dfs(i: element.i, j: element.j, visited: &visited)
+        if visited[element.i][element.j] == false {
+            dfs(i: element.i, j: element.j, visited: &visited, words: &words, str: &str)
+            if str.count > 1 {
+                words[str] = str
+            }
         }
     }
     
-    return str
+    str.removeLast()
+    visited[i][j] = false
 }
 
-var visited: [(i: Int, j: Int)] = []
-let str = dfs(i: 0, j: 0, visited: &visited)
+func findAllCombinations() -> [String: String] {
+    var words:[String: String] = [:]
+    var visited = [[false, false], [false, false]]
+    var str = ""
+    
+    for i in 0..<lettersMatrix.count {
+        for j in 0..<lettersMatrix[i].count {
+            dfs(i: i, j: j, visited: &visited, words: &words, str: &str)
+        }
+    }
+    
+    return words
+}
 
-//let neigbors = neighborgsOf(i: 0, j: 2)
 
-
-
-
-//func depthFirstSearch(_ graph: Graph, source: Node) -> [String] {
-//    var nodesExplored = [source.label]
-//    source.visited = true
-//
-//    for edge in source.neighbors {
-//        if !edge.neighbor.visited {
-//            nodesExplored += depthFirstSearch(graph, source: edge.neighbor)
-//        }
-//    }
-//    return nodesExplored
-//}
-
+let allCombinations = findAllCombinations()
+print("number of combinations: \(allCombinations.count)")
+print("combinations: \n \(allCombinations.values)")
 
 /*
 ['G', 'O', 'S']
 ['A', 'A', 'E']
 ['X', 'P', 'S']
 */
+
+
+
+/*
+ a  b
+ c  d
+ */
+
+/*
+ ab, ad, ac * 4
+ abc, abd, adb, adc, acb, acd * 4
+ */
+
+
+
